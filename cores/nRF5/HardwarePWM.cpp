@@ -122,6 +122,25 @@ bool HardwarePWM::addPin(uint8_t pin)
 
   return true;
 }
+bool HardwarePWM::channelInUse(uint8_t channel)
+{
+  if (channel >= MAX_CHANNELS) return false;
+  
+  uint32_t tmp = _pwm->PSEL.OUT[channel];
+  if ( ((tmp & PWM_PSEL_OUT_CONNECT_Msk) >> PWM_PSEL_OUT_CONNECT_Pos) == PWM_PSEL_OUT_CONNECT_Disconnected ) {
+    return false; // disconnected == not in use
+  }
+  return true;
+}
+bool HardwarePWM::anyChannelInUse()
+{
+  for (uint8_t i = 0; i < MAX_CHANNELS; i++) {
+    if (this->channelInUse(i)) return true;
+  }
+  return false;
+}
+
+
 
 bool HardwarePWM::removePin(uint8_t pin)
 {

@@ -96,6 +96,11 @@ class HardwarePWM
     // Read current set value
     uint16_t readPin     (uint8_t pin);
     uint16_t readChannel (uint8_t ch);
+
+    // Added to help detect PWM modules that are "in use", which will be
+    // used to prevent core components from stepping on each other's use
+    bool channelInUse(uint8_t channel);
+    bool anyChannelInUse();
 };
 
 extern HardwarePWM HwPWM0;
