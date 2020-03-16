@@ -47,11 +47,13 @@
 
 class HardwarePWM
 {
+  public:
+    enum { MAX_CHANNELS_PER_PWM_INSTANCE = 4 }; // Max channel per group
+    enum { INVALID_PWM_PIN_VALUE = 0x7FFF    }; // value stored in register is 15 bits
   private:
-    enum { MAX_CHANNELS = 4 }; // Max channel per group
     NRF_PWM_Type* _pwm;
 
-    uint16_t _seq0[MAX_CHANNELS];
+    uint16_t _seq0[MAX_CHANNELS_PER_PWM_INSTANCE];
 
     uint16_t  _max_value;
     uint8_t  _clock_div;
@@ -59,6 +61,7 @@ class HardwarePWM
     void _start(void);
 
   public:
+
     HardwarePWM(NRF_PWM_Type* pwm);
 
     // Configure
@@ -73,7 +76,7 @@ class HardwarePWM
     int  pin2channel(uint8_t pin)
     {
       pin = g_ADigitalPinMap[pin];
-      for(int i=0; i<MAX_CHANNELS; i++)
+      for(int i=0; i<MAX_CHANNELS_PER_PWM_INSTANCE; i++)
       {
         if ( _pwm->PSEL.OUT[i] == pin ) return i;
       }

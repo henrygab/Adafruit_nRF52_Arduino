@@ -95,7 +95,7 @@ bool HardwarePWM::addPin(uint8_t pin)
   int ch = -1;
 
   // find free slot which is not connected
-  for(int i=0; i<MAX_CHANNELS; i++)
+  for(int i=0; i<MAX_CHANNELS_PER_PWM_INSTANCE; i++)
   {
     if ( _pwm->PSEL.OUT[i] & PWM_PSEL_OUT_CONNECT_Msk )
     {
@@ -124,7 +124,7 @@ bool HardwarePWM::addPin(uint8_t pin)
 }
 bool HardwarePWM::channelInUse(uint8_t channel)
 {
-  if (channel >= MAX_CHANNELS) return false;
+  if (channel >= MAX_CHANNELS_PER_PWM_INSTANCE) return false;
   
   uint32_t tmp = _pwm->PSEL.OUT[channel];
   if ( ((tmp & PWM_PSEL_OUT_CONNECT_Msk) >> PWM_PSEL_OUT_CONNECT_Pos) == PWM_PSEL_OUT_CONNECT_Disconnected ) {
@@ -134,7 +134,7 @@ bool HardwarePWM::channelInUse(uint8_t channel)
 }
 bool HardwarePWM::anyChannelInUse()
 {
-  for (uint8_t i = 0; i < MAX_CHANNELS; i++) {
+  for (uint8_t i = 0; i < MAX_CHANNELS_PER_PWM_INSTANCE; i++) {
     if (this->channelInUse(i)) return true;
   }
   return false;
@@ -175,7 +175,7 @@ void HardwarePWM::begin(void)
   _pwm->LOOP            = 0;
 
   _pwm->SEQ[0].PTR      = (uint32_t) _seq0;
-  _pwm->SEQ[0].CNT      = MAX_CHANNELS; // default mode is Individual --> count must be 4
+  _pwm->SEQ[0].CNT      = MAX_CHANNELS_PER_PWM_INSTANCE; // default mode is Individual --> count must be 4
   _pwm->SEQ[0].REFRESH  = 0;
   _pwm->SEQ[0].ENDDELAY = 0;
 
@@ -190,7 +190,7 @@ void HardwarePWM::begin(void)
 void HardwarePWM::_start(void)
 {
   // update sequence count (depending on mode)
-  //  _pwm->SEQ[0].CNT = MAX_CHANNELS;
+  //  _pwm->SEQ[0].CNT = MAX_CHANNELS_PER_PWM_INSTANCE;
 
   // start sequence
   _pwm->TASKS_SEQSTART[0] = 1;
@@ -203,7 +203,7 @@ void HardwarePWM::stop(void)
 
 bool HardwarePWM::writeChannel(uint8_t ch, uint16_t value, bool inverted )
 {
-  VERIFY( ch < MAX_CHANNELS );
+  VERIFY( ch < MAX_CHANNELS_PER_PWM_INSTANCE );
 
   _seq0[ch] = value | (inverted ? 0 : bit(15));
 
