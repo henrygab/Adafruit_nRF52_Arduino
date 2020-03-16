@@ -15,6 +15,7 @@
 
 #define ARDUINO_MAIN
 #include "Arduino.h"
+#include "wiring_conflict.h"
 
 // DEBUG Level 1
 #if CFG_DEBUG
@@ -70,6 +71,7 @@ static void loop_task(void* arg)
 int main( void )
 {
   init();
+  AnalogWriteState::Initialize();
   initVariant();
 
 #ifdef USE_TINYUSB
