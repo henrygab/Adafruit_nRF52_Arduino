@@ -24,3 +24,15 @@ uint32_t AnalogWriteState::_AnalogWrite_Channel_to_nrfPin[AnalogWriteState::MAX_
 uint16_t AnalogWriteState::_AnalogWrite_nrfPin_to_Channel[AnalogWriteState::NRF_PIN_COUNT];
 uint8_t  AnalogWriteState::_AnalogResolutionInBits = 8;
 
+#if WIRING_CONFLICT_USE_INLINE
+#else
+  WIRING_CONFLICT_INLINE void AnalogWriteState::Initialize(void) {
+    AnalogWriteState::_AnalogResolutionInBits = 8;
+    for (size_t i = 0; i < AnalogWriteState::MAX_ANALOG_PWM_CHANNELS; i++) {
+      AnalogWriteState::_AnalogWrite_Channel_to_nrfPin[i] = static_cast<uint32_t>(-1);
+    }
+    for (size_t i = 0; i < AnalogWriteState::NRF_PIN_COUNT; i++) {
+      AnalogWriteState::_AnalogWrite_nrfPin_to_Channel[i] = AnalogWriteState::INVALID_CHANNEL_INDEX;
+    }
+  }
+#endif
